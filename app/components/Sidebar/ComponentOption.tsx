@@ -4,7 +4,6 @@ import {
   CircleShape,
   TriangleShape,
 } from "~/components/shared/ComponentShapes";
-import { useDrag, DragSourceMonitor } from "react-dnd";
 
 const Shapes = {
   [ComponentType.Square]: SquareShape,
@@ -24,38 +23,7 @@ export const variantCSS = {
 export default function ComponentOption({
   type,
   variant,
-  id,
-  allowedDropEffect,
-  top,
-  left,
-}: Component) {
+}: Pick<Component, "type" | "variant">) {
   const Component = Shapes[type];
-
-  const [{ isDragging }, drag, dragPreview] = useDrag(
-    () => ({
-      type,
-      item: {
-        id,
-        type,
-        variant,
-        allowedDropEffect,
-        top,
-        left,
-      },
-      collect: (monitor: DragSourceMonitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
-    }),
-    [id, type, variant, top, left, allowedDropEffect]
-  );
-
-  return isDragging ? (
-    <div ref={dragPreview} className="translate-x-0	translate-y-0">
-      <Component className={`${variantCSS[variant]}`} />
-    </div>
-  ) : (
-    <div ref={drag} className="translate-x-0	translate-y-0">
-      <Component className={`${variantCSS[variant]}`} />
-    </div>
-  );
+  return <Component className={`${variantCSS[variant]}`} />;
 }

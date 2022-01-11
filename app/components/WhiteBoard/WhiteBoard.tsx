@@ -1,71 +1,25 @@
-import { useDrop, XYCoord } from "react-dnd";
+// import { useDrop, XYCoord } from "react-dnd";
 import React from "react";
 import {
   ComponentType,
   ComponentVariant,
-  Component,
   DropEffect,
 } from "~/types/components";
-import { v4 as uuidv4 } from "uuid";
-import { usePersistedState } from "~/hooks/usePersistedState";
 import ComponentOption from "~/components/Sidebar/ComponentOption";
+import { useDroppable } from "@dnd-kit/core";
+import { useAppState, useAppUpdater } from "~/context/Main";
+import Draggable from "~/components/Sidebar/DraggableWrapper";
+import { CSS } from "@dnd-kit/utilities";
 
-interface IProps {
-  sessionId: string;
-}
-
-export default function WhiteBoard({ sessionId }: IProps) {
+export default function WhiteBoard() {
   const [selectedItem, setSelectedItem] = React.useState<string>("");
+  const state = useAppState();
+  const actions = useAppUpdater();
   const parentRef = React.useRef<HTMLDivElement>(null);
-  const [itemsOnBoard, setItemsOnBoard] = usePersistedState(sessionId, {});
 
-  const [{ canDrop, isOver }, drop] = useDrop(() => ({
-    accept: Object.values(ComponentType),
-    drop: (item: Component, monitor) => {
-      const dropResult = monitor.getDropResult();
-      const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
-      const getSourceClientOffset = monitor.getSourceClientOffset() as XYCoord;
-      const getInitialSourceClientOffset =
-        monitor.getInitialSourceClientOffset() as XYCoord;
-      if (item.allowedDropEffect === DropEffect.Copy) {
-        const newComponent = {
-          ...item,
-          id: uuidv4(),
-          allowedDropEffect: DropEffect.Move,
-        };
-
-        const getInitialClientOffset = monitor.getInitialClientOffset();
-
-        const getClientOffset = monitor.getClientOffset();
-        const left = getSourceClientOffset.x - getInitialSourceClientOffset.x;
-        const top = getSourceClientOffset.y - getInitialSourceClientOffset.y;
-        moveBox(newComponent, left, top);
-      } else {
-        const left = Math.round(item.left + delta.x);
-        const top = Math.round(item.top + delta.y);
-        moveBox(item, left, top);
-      }
-      return undefined;
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-    }),
-  }));
-
-  const moveBox = React.useCallback(
-    (item: Component, left: number, top: number) => {
-      setItemsOnBoard((prev) => ({
-        ...prev,
-        [item.id]: {
-          ...item,
-          top,
-          left,
-        },
-      }));
-    },
-    [itemsOnBoard, setItemsOnBoard]
-  );
+  const { isOver, setNodeRef } = useDroppable({
+    id: "droppable",
+  });
 
   const handleItemClick = (id: string) => {
     setSelectedItem(id === selectedItem ? "" : id);
@@ -74,18 +28,19 @@ export default function WhiteBoard({ sessionId }: IProps) {
   React.useLayoutEffect(() => {
     const removeElement = (e) => {
       if (e.keyCode === 8 && selectedItem) {
-        setItemsOnBoard((prev) => {
-          delete prev[selectedItem];
-          return { ...prev };
-        });
+        actions?.removeItemFromBoard(selectedItem);
       }
     };
 
     document.addEventListener("keydown", removeElement);
     return () => document.removeEventListener("keydown", removeElement);
-  }, [selectedItem, setItemsOnBoard]);
+  }, [selectedItem, actions]);
 
-  const isActive = canDrop && isOver;
+  const isActive = !isOver;
+
+  // const style = {
+  //   transform: CSS.Translate.toString(transform),
+  // };
 
   return (
     <div
@@ -93,30 +48,35 @@ export default function WhiteBoard({ sessionId }: IProps) {
       ref={parentRef}
     >
       <div
-        ref={drop}
+        ref={setNodeRef}
         className={`w-10/12 h-5/6 border-dashed border-4 flex flex-wrap relative ${
-          isActive ? "border-slate-500" : "border-slate-200"
+          isOver ? "border-slate-500" : "border-slate-200"
         }`}
       >
-        {Object.values(itemsOnBoard).map(({ id, variant, type, top, left }) => (
-          <div
-            key={id}
-            className={`h-24 w-24 absolute ${
-              selectedItem === id ? "border-2 border-rose-500" : "border-0"
-            }`}
-            style={{ top, left }}
-            onClick={() => handleItemClick(id as string)}
-          >
-            <ComponentOption
-              id={id}
-              top={top}
-              left={left}
-              allowedDropEffect={DropEffect.Move}
-              type={type as ComponentType}
-              variant={variant as ComponentVariant}
-            />
-          </div>
-        ))}
+        {Object.values(state.boardItems).map(
+          ({ id, variant, type, top, left, delta }) => (
+            <div
+              key={id}
+              className={`h-24 w-24 ${
+                selectedItem === id ? "border-2 border-rose-500" : "border-0"
+              }`}
+              onClick={() => handleItemClick(id as string)}
+            >
+              <Draggable
+                id={id}
+                key={id}
+                type={type as ComponentType}
+                variant={variant as ComponentVariant}
+                allowedDropEffect={DropEffect.Move}
+              >
+                <ComponentOption
+                  type={type as ComponentType}
+                  variant={variant as ComponentVariant}
+                />
+              </Draggable>
+            </div>
+          )
+        )}
       </div>
     </div>
   );

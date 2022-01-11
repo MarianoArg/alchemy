@@ -5,17 +5,22 @@ import {
   ComponentVariant,
   DropEffect,
 } from "~/types/components";
-import { ComponentsData } from "~/data/components";
+
+import Draggable from "./DraggableWrapper";
+import { DragOverlay } from "@dnd-kit/core";
+import { useAppState } from "~/context/Main";
 
 export default function ComponentSection() {
+  const state = useAppState();
+
   return (
     <div>
       <Accordion.Root
         type="single"
         collapsible
-        defaultValue={`component-${ComponentsData[0]?.id}`}
+        defaultValue={`component-${state.sidebarItems[0]?.id}`}
       >
-        {ComponentsData.map((component, i) => (
+        {state.sidebarItems.map((component, i) => (
           <Accordion.Item
             key={component.id}
             value={`component-${component.id}`}
@@ -41,26 +46,38 @@ export default function ComponentSection() {
             </Accordion.Header>
             <Accordion.Content className="dataOpen:animate-slideDown dataClosed:animate-slideUp overflow-hidden bg-sky-50 p-4">
               <div className="grid grid-cols-2 gap-4">
-                {component.items.map((item) => (
-                  <div
+                {Object.values(component?.items ?? []).map((item) => (
+                  <Draggable
+                    id={item.id}
                     key={item.id}
-                    className="overflow-hidden bg-white p-3 cursor-pointer hover:ring-2 ring-sky-600"
+                    type={component.type as ComponentType}
+                    variant={item.variant as ComponentVariant}
+                    allowedDropEffect={DropEffect.Copy}
                   >
-                    <ComponentOption
-                      top={0}
-                      id={item.id}
-                      allowedDropEffect={DropEffect.Copy}
-                      left={0}
-                      type={component.type as ComponentType}
-                      variant={item.variant as ComponentVariant}
-                    />
-                  </div>
+                    <div
+                      key={item.id}
+                      className="overflow-hidden bg-white p-3 cursor-pointer hover:ring-2 ring-sky-600"
+                    >
+                      <ComponentOption
+                        type={component.type as ComponentType}
+                        variant={item.variant as ComponentVariant}
+                      />
+                    </div>
+                  </Draggable>
                 ))}
               </div>
             </Accordion.Content>
           </Accordion.Item>
         ))}
       </Accordion.Root>
+      <DragOverlay>
+        {state.activeItem ? (
+          <ComponentOption
+            type={state.activeItem.type as ComponentType}
+            variant={state.activeItem.variant as ComponentVariant}
+          />
+        ) : null}
+      </DragOverlay>
     </div>
   );
 }

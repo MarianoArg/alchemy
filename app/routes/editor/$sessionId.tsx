@@ -2,7 +2,11 @@ import { useCatch, redirect, useLoaderData } from "remix";
 import type { LoaderFunction, MetaFunction } from "remix";
 import WhiteBoard from "~/components/WhiteBoard";
 import { getSession, destroySession } from "~/services/session";
+import { ComponentsData } from "~/data/components";
+import { useAppUpdater } from "~/context/Main";
 import React from "react";
+import { DndContext } from "@dnd-kit/core";
+import { ClientOnly } from "remix-utils";
 
 export let loader: LoaderFunction = async ({ params, request }) => {
   const session = await getSession(request.headers.get("Cookie"));
@@ -18,18 +22,47 @@ export let loader: LoaderFunction = async ({ params, request }) => {
     }
   }
 
-  return { sessionId: params.sessionId };
+  return { sessionId: params.sessionId, sidebarItems: ComponentsData };
 };
 
 export default function EditionSession() {
-  let { sessionId } = useLoaderData();
-  const [renderBoard, setRenderBoard] = React.useState<boolean>(false);
+  const actions = useAppUpdater();
+
+  let { sessionId, sidebarItems } = useLoaderData();
 
   React.useEffect(() => {
-    setRenderBoard(true);
+    if (actions) {
+      actions?.init(sessionId);
+      actions?.setSidebarItems(sidebarItems);
+    }
   }, []);
 
-  return renderBoard ? <WhiteBoard sessionId={sessionId} /> : null;
+  function handleDragStart(event) {
+    const { active } = event;
+    const { current } = active.data;
+
+    actions?.moveItem({
+      id: active.id,
+      ...current,
+    });
+  }
+
+  function handleDragEnd(event) {
+    const { active, over, delta } = event;
+    const { current } = active.data;
+
+    if (over) {
+      actions?.updateItem({
+        id: active.id,
+        delta,
+        top: over.rect.top,
+        left: delta.x,
+      });
+    }
+    actions?.moveItem(null);
+  }
+
+  return <WhiteBoard />;
 }
 
 export function CatchBoundary() {

@@ -8,6 +8,7 @@ import {
 } from "remix";
 import type { MetaFunction } from "remix";
 import styles from "./styles/tailwind.css";
+import { AppProvider } from "~/context/Main";
 
 export function links() {
   return [
@@ -41,7 +42,9 @@ export default function App() {
       <body>
         <div className="h-screen w-screen">
           <main className="app__main h-full w-full antialiased">
-            <Outlet />
+            <AppProvider>
+              <Outlet />
+            </AppProvider>
           </main>
         </div>
         <ScrollRestoration />
