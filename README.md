@@ -4,7 +4,7 @@
 
 This project was bootstrapped with [Remix](https://remix.run/)
 
-Other tools used are:
+Other tools used are:  
 [Typescript](https://www.typescriptlang.org/).  
 [TailwindCSS](https://tailwindcss.com/) for styling.
 
