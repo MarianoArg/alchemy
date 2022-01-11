@@ -1,6 +1,12 @@
-# Welcome to Remix!
+# Alchemy code challenge
 
-- [Remix Docs](https://remix.run/docs)
+## Intro
+
+This project was bootstrapped with [Remix](https://remix.run/)
+
+Other tools used are:
+[Typescript](https://www.typescriptlang.org/)
+[TailwindCSS](https://tailwindcss.com/) for styling.
 
 ## Development
 
@@ -14,40 +20,25 @@ This starts your app in development mode, rebuilding assets on file changes.
 
 ## Deployment
 
-First, build your app for production:
+The app is configured to automatically be deployed using [Vercel](https://vercel.com/).
 
-```sh
-npm run build
-```
+## Approachs
 
-Then run the app in production mode:
+The challenge was addressed following 2 different approachs.
 
-```sh
-npm start
-```
+#### Using React-dnd
 
-Now you'll need to pick a host to deploy it to.
+Demo: [Alchemy react-dnd demo](https://alchemy.marianoarg.dev/)
 
-### DIY
+The first one was using the [react-dnd](https://react-dnd.github.io/react-dnd/about) library.
 
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
+This is the most complete version of the challenge.
 
-Make sure to deploy the output of `remix build`
+The issue with this approach was setting the right position after dropping the shape into the canvas. After dealing with a couple of hours with this issue without any luck, I've decided to try a different library.
 
-- `build/`
-- `public/build/`
+#### Using Dnd-kit
 
-### Using a Template
+Demo: [Alchemy dnd-kit demo](https://alchemy-test-ic10x7wew-marianoarg.vercel.app/)
 
-When you ran `npx create-remix@latest` there were a few choices for hosting. You can run that again to create a new project, then copy over your `app/` folder to the new project that's pre-configured for your target server.
-
-```sh
-cd ..
-# create a new project, and pick a pre-configured host
-npx create-remix@latest
-cd my-new-remix-app
-# remove the new project's app (not the old one!)
-rm -rf app
-# copy your app over
-cp -R ../my-old-remix-app/app app
-```
+In this approach I changed the app state management, migrating the whole state to a context and consuming it where necessary.
+This is the less achieved approach, with different issues like shape positioning and being unable to delete them.
