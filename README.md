@@ -28,7 +28,9 @@ The challenge was addressed following 2 different approachs.
 
 ### `Using React-dnd`
 
-Demo: [Alchemy react-dnd demo](https://alchemy.marianoarg.dev/)
+**Demo**: [Alchemy react-dnd demo](https://alchemy.marianoarg.dev/).  
+**Branch**: [react-dnd source](https://github.com/MarianoArg/alchemy).  
+
 
 The first one was using the [react-dnd](https://react-dnd.github.io/react-dnd/about) library.
 
@@ -38,7 +40,9 @@ The issue with this approach was setting the right position after dropping the s
 
 ### `Using Dnd-kit`
 
-Demo: [Alchemy dnd-kit demo](https://alchemy-test-ic10x7wew-marianoarg.vercel.app/)
+**Demo**: [Alchemy dnd-kit demo](https://alchemy-test-ic10x7wew-marianoarg.vercel.app/).  
+**Branch**: [dnd-kit source](https://github.com/MarianoArg/alchemy/tree/dnd-kit-implementation).  
+
 
 In this approach I changed the app state management, migrating the whole state to a context and consuming it where necessary.
 This is the less achieved approach, with different issues like shape positioning and being unable to delete them.
