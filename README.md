@@ -5,7 +5,7 @@
 This project was bootstrapped with [Remix](https://remix.run/)
 
 Other tools used are:
-[Typescript](https://www.typescriptlang.org/)
+[Typescript](https://www.typescriptlang.org/).  
 [TailwindCSS](https://tailwindcss.com/) for styling.
 
 ## Development
@@ -26,7 +26,7 @@ The app is configured to automatically be deployed using [Vercel](https://vercel
 
 The challenge was addressed following 2 different approachs.
 
-#### Using React-dnd
+### `Using React-dnd`
 
 Demo: [Alchemy react-dnd demo](https://alchemy.marianoarg.dev/)
 
@@ -36,7 +36,7 @@ This is the most complete version of the challenge.
 
 The issue with this approach was setting the right position after dropping the shape into the canvas. After dealing with a couple of hours with this issue without any luck, I've decided to try a different library.
 
-#### Using Dnd-kit
+### `Using Dnd-kit`
 
 Demo: [Alchemy dnd-kit demo](https://alchemy-test-ic10x7wew-marianoarg.vercel.app/)
 
